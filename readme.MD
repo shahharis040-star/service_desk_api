@@ -44,7 +44,7 @@ Tutti gli endpoint non pubblici sono protetti tramite **middleware JWT**.
 
 ## Architettura
 
-
+```
 /
 ├── app/
 │   ├── Controllers/        # handler richieste HTTP
@@ -56,7 +56,7 @@ Tutti gli endpoint non pubblici sono protetti tramite **middleware JWT**.
 ├── config/                 # configurazione DB e .env
 ├── public/                 # entry point
 └── docs/                   # Postman collection
-
+```
 ---
 
 ## Getting Started
