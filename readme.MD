@@ -8,14 +8,13 @@ Un sistema backend sicuro, RESTful per il management di utenti ed interventi tec
 - [Tech Stack](#tech-stack)
 - [Architettura](#architettura)
 - [Getting Started](#getting-started)
-- [Environment Variables](#environment-variables)
-- [Database Setup](#database-setup)
+- [Variabili Ambiente](#variabili-ambiente)
+- [Setup Database](#setup-database)
 - [API Endpoints](#api-endpoints)
-- [Request & Response Examples](#request--response-examples)
-- [Filtering & Pagination](#filtering--pagination)
-- [Error Handling](#error-handling)
+- [Esempi Request & Response](#esempi-request--response)
+- [Filtri & Paginazione](#filtri--paginazione)
+- [Gestione errori](#gestione-errori)
 - [Testing](#testing)
-- [Optional Features](#optional-features)
 
 ---
 
@@ -38,25 +37,24 @@ Tutti gli endpoint non pubblici sono protetti tramite **middleware JWT**.
 | Authentication  | JWT (JSON Web Token)           |
 | Local Server    | PHP built-in / Apache / Nginx  |
 | Testing         | Postman / Thunder Client       |
-| (Optional)      | Docker                         |
 
 ---
 
 ## Architettura
 
-
+```
 /
 ├── app/
-│   ├── Controllers/        # handler richieste HTTP
-│   ├── Services/           # Logica
-│   ├── Repositories/       # PDO
-│   └── Models/             # Rappresentazione dati
-├── middleware/             # middlewere con JWT
-├── routes/                 # definizione dei routes
-├── config/                 # configurazione DB e .env
-├── public/                 # entry point
-└── docs/                   # Postman collection
-
+│   ├── Controllers/        # HTTP request handlers
+│   ├── Services/           # Business logic
+│   ├── Repositories/       # Database access layer (PDO)
+│   └── Models/             # Data representation
+├── middleware/             # JWT auth middleware
+├── routes/                 # Route definitions
+├── config/                 # DB config, env loader
+├── public/                 # Entry point (index.php)
+└── docs/                   # Postman collection, schema
+```
 ---
 
 ## Getting Started
@@ -65,7 +63,6 @@ Tutti gli endpoint non pubblici sono protetti tramite **middleware JWT**.
 
 - PHP >= 8.0
 - MySQL >= 8.0
-- Composer (optional, if using packages)
 
 ### Installazione
 
@@ -85,9 +82,9 @@ php -S localhost:8000 -t public
 
 L'API sarà disponibile a  `http://localhost:8000`.
 
-## Environment Variables
+## Variabili Ambiente
 
-Create a `.env` file in the project root (never commit this file):
+Crea un file `.env` nel root del progetto :
 
 ```env
 DB_HOST=localhost
@@ -104,9 +101,9 @@ JWT_EXPIRATION=3600
 
 ---
 
-## Database Setup
+## Setup Database
 
-Run the following SQL to create the required tables:
+Esegui le seguenti query per creare le tabelle necessarie:
 
 ```sql
 CREATE DATABASE IF NOT EXISTS service_desk CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -135,40 +132,40 @@ CREATE TABLE interventions (
 
 ## API Endpoints
 
-### Authentication
+### Autenticazione
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
-| `POST` | `/auth/register` | ❌ | Register a new user |
-| `POST` | `/auth/login` | ❌ | Login and receive a JWT token |
-| `GET` | `/auth/me` | ✅ | Get the current authenticated user |
+| `POST` | `/auth/register` | ❌ | Registra un nuovo utente |
+| `POST` | `/auth/login` | ❌ | Accedi e ottini un token JWT |
+| `GET` | `/auth/me` | ✅ | Ottieni l'utente attualmente autenticato |
 
-### Users
-
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| `GET` | `/users` | ✅ | List all users |
-| `GET` | `/users/{id}` | ✅ | Get a single user |
-| `PUT` | `/users/{id}` | ✅ | Update user data |
-| `DELETE` | `/users/{id}` | ✅ | Delete a user |
-
-### Interventions
+### Utenti
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
-| `GET` | `/interventions` | ✅ | List interventions (supports filters) |
-| `POST` | `/interventions` | ✅ | Create a new intervention |
-| `GET` | `/interventions/{id}` | ✅ | Get a single intervention |
-| `PUT` | `/interventions/{id}` | ✅ | Update an intervention |
-| `DELETE` | `/interventions/{id}` | ✅ | Delete an intervention |
+| `GET` | `/users` | ✅ | Lista di tutti gli utenti |
+| `GET` | `/users/{id}` | ✅ | Ottieni un singolo utente |
+| `PUT` | `/users/{id}` | ✅ | Aggionra i dati di un utente |
+| `DELETE` | `/users/{id}` | ✅ | Elimina un utente |
 
-> ✅ = Requires `Authorization: Bearer <token>` header
+### Interventi
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| `GET` | `/interventions` | ✅ | Lista degli interventi |
+| `POST` | `/interventions` | ✅ | Crea nuovo intervento |
+| `GET` | `/interventions/{id}` | ✅ | Ottieni un singolo intervento |
+| `PUT` | `/interventions/{id}` | ✅ | Aggiorna i dati di un intervento |
+| `DELETE` | `/interventions/{id}` | ✅ | Elimina un intervento |
+
+> ✅ = Richiede `Authorization: Bearer <token>` nell'header
 
 ---
 
-## Request & Response Examples
+## Esempi Request & Response
 
-### Register
+### Registrazione
 
 ```http
 POST /auth/register
@@ -183,7 +180,7 @@ Content-Type: application/json
 ```json
 // 201 Created
 {
-  "message": "User registered successfully",
+  "message": "Utente registrato correttamente",
   "user_id": 1
 }
 ```
@@ -208,7 +205,7 @@ Content-Type: application/json
 }
 ```
 
-### Create Intervention
+### Creare Intervento
 
 ```http
 POST /interventions
@@ -216,8 +213,8 @@ Authorization: Bearer <token>
 Content-Type: application/json
 
 {
-  "title": "Server not responding",
-  "description": "Production server unreachable since 14:00",
+  "title": "Server non risponde",
+  "description": "Server non raggiungibile dalle 14:00",
   "status": "open"
 }
 ```
@@ -226,15 +223,15 @@ Content-Type: application/json
 // 201 Created
 {
   "id": 5,
-  "title": "Server not responding",
-  "description": "Production server unreachable since 14:00",
+  "title": "Server non risponde",
+  "description": "Server non raggiungibile dalle 14:00",
   "status": "open",
   "user_id": 1,
   "created_at": "2025-04-28T14:30:00Z"
 }
 ```
 
-### Update Intervention Status
+### Aggiornare stato degli interventi
 
 ```http
 PUT /interventions/5
@@ -249,87 +246,77 @@ Content-Type: application/json
 ```json
 // 200 OK
 {
-  "message": "Intervention updated successfully"
+  "message": "Intervento aggiornato correttamente"
 }
 ```
 
 ---
 
-## Filtering & Pagination
+## Filtri & Paginazione
 
-The `GET /interventions` endpoint supports the following query parameters:
+Il `GET /interventions` endpoint supporta i seguenti parametri query:
 
 ```bash
-# Filter by status
+# Filtra per stato
 GET /interventions?status=open
 
-# Filter by assigned user
+# Filtra per utente di assegnazione
 GET /interventions?user_id=1
 
-# Search by keyword in title or description
+# Ricerca per parola chiave in titolo o descrizione
 GET /interventions?search=server
 
-# Pagination
+# Paginazione
 GET /interventions?page=1&limit=10
 
 # Sorting
 GET /interventions?sort=created_at&order=desc
 
-# Combined
+# Combinati
 GET /interventions?status=open&sort=created_at&order=desc&page=1&limit=5
 ```
 
 ---
 
-## Error Handling
+## Gestione errori
 
-All errors return a consistent JSON structure:
+TUTTI gli errori ritornato la stessa struttura JSON:
 
 ```json
 {
-  "error": "Descriptive error message"
+  "error": "Messaggio di errore descrittivo"
 }
 ```
 
 | Status Code | Meaning |
 |-------------|---------|
 | `200` | OK |
-| `201` | Resource created |
-| `400` | Bad request / validation error |
-| `401` | Unauthorized — missing or invalid token |
-| `404` | Resource not found |
+| `201` | Risorsa creata |
+| `400` | Richiesta malformata / errore di validazione |
+| `401` | Inautorizzato - token mancante o invalido |
+| `404` | Risorsa non trovata |
 
 ---
 
 ## Testing
 
-A Postman collection covering all endpoints is available in `/docs/postman_collection.json`.
+E' disponibile una collection Postman per testare tutti gli endpoint in: `/docs/postman_collection.json`.
 
 **Import it:**
-1. Open Postman → Import → select the file
-2. Set the `base_url` variable to `http://localhost:8000`
-3. Run the **Auth** folder first to get a token
-4. The token is automatically set for subsequent requests
+1. Apri Postman → Import → seleziona in file
+2. Imposta il `base_url` come `http://localhost:8000`
+3. Esegui prima la cartella **Auth** per ricevere il token
+4. Il token viene impostato automaticamente per le richieste successive
+
 
 ---
 
-## Optional Features
+## Sicurezza
 
-- [x] Filtering by status, user, keyword
-- [x] Pagination (`?page` & `?limit`)
-- [x] Sorting (`?sort` & `?order`)
-- [ ] Error logging to file
-- [ ] Docker support
-- [ ] Role-based access control middleware
-
----
-
-## Security
-
-- Passwords hashed with **bcrypt** via `password_hash()`
-- All DB queries use **PDO prepared statements** (no SQL injection)
-- JWT tokens have configurable **expiration**
-- Error responses never expose internal stack traces or system details
+- Password sottoposte a hash con **bcrypt** tramite `password_hash()`
+- Tutte le query utilizzano **PDO prepared statements** (nessun rischio di SQL injection)
+- I token JWT hanno una **scadenza** configurabile
+- Le risposte di errore non rivelano mai tracce dello stack interne né dettagli di sistema
 
 ---
 
