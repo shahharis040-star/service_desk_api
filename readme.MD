@@ -47,15 +47,15 @@ Tutti gli endpoint non pubblici sono protetti tramite **middleware JWT**.
 ```
 /
 ├── app/
-│   ├── Controllers/        # handler richieste HTTP
-│   ├── Services/           # Logica
-│   ├── Repositories/       # PDO
-│   └── Models/             # Rappresentazione dati
-├── middleware/             # middlewere con JWT
-├── routes/                 # definizione dei routes
-├── config/                 # configurazione DB e .env
-├── public/                 # entry point
-└── docs/                   # Postman collection
+│   ├── Controllers/        # HTTP request handlers
+│   ├── Services/           # Business logic
+│   ├── Repositories/       # Database access layer (PDO)
+│   └── Models/             # Data representation
+├── middleware/             # JWT auth middleware
+├── routes/                 # Route definitions
+├── config/                 # DB config, env loader
+├── public/                 # Entry point (index.php)
+└── docs/                   # Postman collection, schema
 ```
 ---
 
