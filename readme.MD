@@ -320,6 +320,6 @@ E' disponibile una collection Postman per testare tutti gli endpoint in: `/docs/
 
 ---
 
-## License
+## Licenza
 
-MIT — feel free to use, modify, and distribute.
+MIT
