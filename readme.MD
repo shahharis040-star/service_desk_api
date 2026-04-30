@@ -74,7 +74,7 @@ cd service-desk-api
 # 2. Copia il file .env 
 cp .env.example .env
 
-# 3. Setuppa il database (vedi setup Database più in fondo)
+# 3. Setuppa il database eseguendo il file "setup.sql"
 
 # 4. Avvia il server locale
 php -S localhost:8000 -t public
@@ -82,51 +82,6 @@ php -S localhost:8000 -t public
 
 L'API sarà disponibile a  `http://localhost:8000`.
 
-## Variabili Ambiente
-
-Crea un file `.env` nel root del progetto :
-
-```env
-DB_HOST=localhost
-DB_PORT=3306
-DB_NAME=service_desk
-DB_USER=root
-DB_PASS=your_password
-
-JWT_SECRET=your_super_secret_key
-JWT_EXPIRATION=3600
-```
-
-> ⚠️ `.env` is listed in `.gitignore`. Use `.env.example` as a template.
-
----
-
-## Setup Database
-
-Esegui le seguenti query per creare le tabelle necessarie:
-
-```sql
-CREATE DATABASE IF NOT EXISTS service_desk CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
-USE service_desk;
-
-CREATE TABLE users (
-    id          INT AUTO_INCREMENT PRIMARY KEY,
-    email       VARCHAR(255) NOT NULL UNIQUE,
-    password    VARCHAR(255) NOT NULL,
-    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE interventions (
-    id          INT AUTO_INCREMENT PRIMARY KEY,
-    title       VARCHAR(255) NOT NULL,
-    description TEXT,
-    status      VARCHAR(20) NOT NULL DEFAULT 'open',
-    user_id     INT NOT NULL,
-    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
-```
 
 ---
 
@@ -302,11 +257,11 @@ TUTTI gli errori ritornato la stessa struttura JSON:
 
 E' disponibile una collection Postman per testare tutti gli endpoint in: `/docs/postman_collection.json`.
 
-**Import it:**
+**Importa la collection:**
 1. Apri Postman → Import → seleziona in file
 2. Imposta il `base_url` come `http://localhost:8000`
 3. Esegui prima la cartella **Auth** per ricevere il token
-4. Il token viene impostato automaticamente per le richieste successive
+4. Vai su Authorization->Auth typ-> Bearer Token ed inserisci il token ricevuto dalla login , verrà salvato per le richieste successive
 
 
 ---
