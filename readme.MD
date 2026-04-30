@@ -22,7 +22,7 @@ Un sistema backend sicuro, RESTful per il management di utenti ed interventi tec
 
 ServiceDesk API è un sistema backend che espone endpoint HTTP sicuri per:
 - **Gestione utenti** — registrazione, accesso, operazioni CRUD sul profilo
-- **Monitoraggio degli interventi** — creazione e gestione dei ticket tecnici con relativo ciclo di vita degli stati (`open` → `in_progress` → `closed`)
+- **Monitoraggio degli interventi** — creazione e gestione dei ticket tecnici con relativo ciclo di vita degli stati (`aperto` → `in corso` → `chiuso`)
 Tutti gli endpoint non pubblici sono protetti tramite **middleware JWT**.
 
 ---
@@ -31,12 +31,12 @@ Tutti gli endpoint non pubblici sono protetti tramite **middleware JWT**.
 
 | Layer           | Tecnologia |
 |-----------------|--------------------------------|
-| Linguaggio      | PHP >= 8.0                     |
+| Language        | PHP >= 8.0                     |
 | Database        | MySQL 8                        |
-| Accesso DB      | PDO (prepared statements)      |
-| Autenticazione  | JWT (JSON Web Token)           |
-| Server locale   | PHP built-in |
-| Testing         | Postman        |
+| DB Access       | PDO (prepared statements)      |
+| Authentication  | JWT (JSON Web Token)           |
+| Local Server    | PHP built-in / Apache / Nginx  |
+| Testing         | Postman / Thunder Client       |
 
 ---
 
@@ -45,13 +45,14 @@ Tutti gli endpoint non pubblici sono protetti tramite **middleware JWT**.
 ```
 /
 ├── app/
-│   ├── Controllers/        # Gestione richieste HTTP
-│   ├── Services/           # Logica core
-│   ├── Repositories/       # Accesso DB con PDO
-├── middleware/             # Autenticazione con JWT
-├── routes/                 # Definizione Routes
+│   ├── Controllers/        # handler richieste HTTP
+│   ├── Services/           # Logica
+│   ├── Repositories/       # PDO
+│   └── Models/             # Rappresentazione dati
+├── middleware/             # middlewere con JWT
+├── routes/                 # definizione dei routes
 ├── config/                 # configurazione DB e .env
-├── public/                 # Entry point (index.php)
+├── public/                 # entry point
 └── docs/                   # Postman collection
 ```
 ---
@@ -67,14 +68,13 @@ Tutti gli endpoint non pubblici sono protetti tramite **middleware JWT**.
 
 ```bash
 # 1. Clona la repository
-git clone https://github.com/tuo-nome-utente/service-desk-api.git
+git clone https://github.com/shahharis040-star/service-desk-api.git
 cd service-desk-api
 
 # 2. Copia il file .env 
 cp .env.example .env
 
-# 3. Setuppa il database 
-Esegui le query SQL presenti dentro il file setup.sql
+# 3. Setuppa il database (vedi setup Database più in fondo)
 
 # 4. Avvia il server locale
 php -S localhost:8000 -t public
@@ -82,8 +82,51 @@ php -S localhost:8000 -t public
 
 L'API sarà disponibile a  `http://localhost:8000`.
 
+## Variabili Ambiente
+
+Crea un file `.env` nel root del progetto :
+
+```env
+DB_HOST=localhost
+DB_PORT=3306
+DB_NAME=service_desk
+DB_USER=root
+DB_PASS=your_password
+
+JWT_SECRET=your_super_secret_key
+JWT_EXPIRATION=3600
+```
+
+> ⚠️ `.env` is listed in `.gitignore`. Use `.env.example` as a template.
+
 ---
 
+## Setup Database
+
+Esegui le seguenti query per creare le tabelle necessarie:
+
+```sql
+CREATE DATABASE IF NOT EXISTS service_desk CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+USE service_desk;
+
+CREATE TABLE users (
+    id          INT AUTO_INCREMENT PRIMARY KEY,
+    email       VARCHAR(255) NOT NULL UNIQUE,
+    password    VARCHAR(255) NOT NULL,
+    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE interventions (
+    id          INT AUTO_INCREMENT PRIMARY KEY,
+    title       VARCHAR(255) NOT NULL,
+    description TEXT,
+    status      VARCHAR(20) NOT NULL DEFAULT 'open',
+    user_id     INT NOT NULL,
+    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+```
 
 ---
 
@@ -129,8 +172,8 @@ POST /auth/register
 Content-Type: application/json
 
 {
-  "email": "mario@esempio.com",
-  "password": "password123"
+  "email": "mario@example.com",
+  "password": "secret123"
 }
 ```
 
@@ -149,8 +192,8 @@ POST /auth/login
 Content-Type: application/json
 
 {
-  "email": "mario@esempio.com",
-  "password": "password123"
+  "email": "mario@example.com",
+  "password": "secret123"
 }
 ```
 
@@ -245,7 +288,7 @@ TUTTI gli errori ritornato la stessa struttura JSON:
 }
 ```
 
-| Status Code | Significato |
+| Status Code | Meaning |
 |-------------|---------|
 | `200` | OK |
 | `201` | Risorsa creata |
@@ -263,7 +306,8 @@ E' disponibile una collection Postman per testare tutti gli endpoint in: `/docs/
 1. Apri Postman → Import → seleziona in file
 2. Imposta il `base_url` come `http://localhost:8000`
 3. Esegui prima la cartella **Auth** per ricevere il token
-4. Andare su "Authorization" -> "Auth Type" -> "Bearer Token" ed inserire il token ritornato dall'API di login, il token verrà salvato per le API successive
+4. Il token viene impostato automaticamente per le richieste successive
+
 
 ---
 
@@ -276,6 +320,6 @@ E' disponibile una collection Postman per testare tutti gli endpoint in: `/docs/
 
 ---
 
-## License
+## Licenza
 
-MIT — feel free to use, modify, and distribute.
+MIT
